@@ -120,7 +120,7 @@ For candidates that passed dedup, call `mcp__Notion__notion-create-pages` with t
 
 ### Step 4 — Refresh thread summaries on open rows
 
-Query the intake DB for rows where `"Incident Status"` is NOT one of: Done / Won't Fix / Not an issue.
+Query the intake DB for rows where `"Incident Status"` is NOT one of: Done / Won't Fix / Not an issue and `"Severity"` is: Urgent / High
 
 For each open row:
 1. Read its `"Slack Thread"` URL to get the thread ID.
@@ -164,13 +164,29 @@ The issue summary should capture what went wrong, where, and on which robot (if 
 
 Never write to the Clustering DB. Never set any relation field. Promotion is manual.
 
-### Step 6 — Send run report
+### Step 6 - Create Notion row
 
-Call `PushNotification` with a summary:
+Check the Notion database at [https://www.notion.so/lionsbotinternational/390ca9552bd880e19238f2dcad8df639?v=390ca9552bd8809b9742000c620dd1de&source=copy_link] for a row where the Date property equals today's date.
+
+If no row exists for today:
+- Create a new page in that database with Date set to today's date and Title set to today's date (YYYY-MM-DD).
+- Add your notes as content in the page body under a heading "R5 lionsbot-triage-bot Notes".
+
+If a row already exists for today:
+- Open that page and append your notes under a heading "R5 lionsbot-triage-bot Notes" 
+(add this heading even if one already exists, don't overwrite prior content).
+
+### Step 7 — Send run report
+
+Compose a run report with:
 - Number of new rows created
 - Number of open rows refreshed
 - Any errors or pages that need manual attention (e.g., archived pages, missing fields)
 - Date range scanned
+
+Then:
+1. Append the run report to the Notion page from Step 6 under the "R5 lionsbot-triage-bot Notes" heading.
+2. Call `PushNotification` with the same run report content.
 
 ---
 
