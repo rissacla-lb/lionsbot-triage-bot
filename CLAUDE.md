@@ -124,7 +124,9 @@ For candidates that passed dedup, call `mcp__Notion__notion-create-pages` with t
 
 Query the intake DB for rows where `"Incident Status"` is NOT one of: Done / Won't Fix / Not an issue and `"Severity"` is: Urgent / High
 
-For each open row:
+> **Every row created in this run's Step 3 always gets this treatment too, regardless of Severity.** The Severity filter above governs which *pre-existing* open rows get re-synced on a given run — it is not a gate on whether a brand-new incident gets its first summary. A freshly reported incident is very often missing Severity entirely (the Slack workflow form has no Severity/Priority field, and per the "never fabricate" rule you leave it blank) — if Step 4 only looked at Urgent/High, that row would silently never receive a Thread Summary/Suggestions body at all. So: run the Step 4 write below for (a) every row matching the Severity query above, **union** (b) every row this run just created in Step 3, with no Severity filter applied to (b).
+
+For each open row (from either (a) or (b) above):
 1. Read its `"Slack Thread"` URL to get the thread ID.
 2. Call `mcp__Slack__slack_read_thread` to fetch all current replies.
 3. Summarize the thread using this format:
@@ -162,7 +164,7 @@ For each new intake row created in Step 3, write to `"AI Triage Notes"` using th
 Possible cluster match: "<Cluster Name>" — <brief reason>
 ```
 
-The issue summary should capture what went wrong, where, and on which robot (if known). Omit the cluster match line if no good match is found.
+The issue summary should capture what went wrong, where, and on which robot (if known). **Always include a cluster match line — pick the single closest existing cluster even if the match is imperfect (e.g. a version mismatch, a related-but-not-identical symptom, or an adjacent subsystem).** Never leave the line out for lack of a perfect match; only skip it if the Clustering DB has zero entries even loosely related to the issue's subsystem/symptom. When the match is imperfect, say so plainly in the reason (e.g. "closest available match, though this incident is on 1.1.4 not 1.0.x").
 
 Never write to the Clustering DB. Never set any relation field. Promotion is manual.
 
