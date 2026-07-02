@@ -37,7 +37,7 @@ Use these exact property names when reading or writing. Several have been rename
 |---|---|---|
 | `"Issue Summary"` | title | VERBATIM workflow title from Slack — do not paraphrase |
 | `"Incident Status"` | select | Use `"New"` for all new rows. Options: Not started / Pending RST / New / Investigating / On-Hold / Decision Pending / Fix in Progress / Rollout / Verification / Won't Fix / Feature Request / In progress / Done / Not an issue |
-| `"Date of Incident (UTC)"` | date | Extract date AND time from the "Date & Time of Issue" field in the workflow. Always set `date:Date of Incident (UTC):is_datetime: 1`. Store as UTC — append `Z` if no timezone is present in the form value. Do NOT convert to SGT or any other local timezone. |
+| `"Date of Incident (UTC)"` | date | Extract date AND time from the "Date & Time of Issue" field in the workflow. Always set `date:Date of Incident (UTC):is_datetime: 1`. Store the datetime exactly as it appears in the form value — do not append any timezone indicator and do not convert to any timezone. |
 | `"Source Channel"` | **multi_select** | Options: `#r5-trials-support` / `#tesco-trial-support` / `#voc-r5-production` / `Other` |
 | `"Customer / Trial Site"` | text | Spaces around the slash — exactly `"Customer / Trial Site"` |
 | `"Slack Thread"` | url | Plain property name — no `userDefined:` prefix |
@@ -202,7 +202,7 @@ Extract these fields from the Slack workflow form text:
 |---|---|
 | `"Issue Summary"` | Workflow title / form title — copy VERBATIM |
 | `"Robot ID"` | "Robot ID" or "Serial Number" field |
-| `"Date of Incident (UTC)"` | "Date & Time of Issue" — extract both date and time as UTC (append `Z`); do not convert to SGT |
+| `"Date of Incident (UTC)"` | "Date & Time of Issue" — extract both date and time exactly as written; do not append any timezone indicator |
 | `"AUT Version"` | "Software Version" or "AUT Version" field — only set if value matches allowed options |
 | `"Customer / Trial Site"` | "Site" or "Customer" field |
 | `"Severity"` | "Severity" or "Priority" field — only set if value matches: Urgent / High / Medium / Low |
