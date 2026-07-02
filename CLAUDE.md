@@ -58,7 +58,9 @@ Use these exact property names when reading or writing. Several have been rename
 
 ### Step 1 — Read Slack channel
 
-Call `mcp__Slack__slack_read_channel` on `C09H796EZQ8` with a 2-day lookback. Collect every top-level thread that contains a workflow submission (look for the structured workflow form fields: Robot ID, Date & Time of Issue, Issue Summary / Title, etc.).
+> **Resolve "now" from the live system clock, never from injected session context.** The `currentDate` value in the session's `<system-reminder>` is a one-time snapshot taken when the session/turn started — it does **not** advance as the run progresses. This routine involves many tool calls (reading dozens of threads, writing dozens of Notion updates) and can run long enough for real time to cross a day boundary while that cached value stays put. Before computing the lookback window, always shell out to get the actual current time (e.g. `date -u +"%Y-%m-%dT%H:%M:%SZ"`) and derive the 2-day window from that — not from `currentDate`. Using a stale cached date has previously caused the window to silently end early and miss up to a day's worth of incidents.
+
+Call `mcp__Slack__slack_read_channel` on `C09H796EZQ8` with a 2-day lookback computed from the live clock (see above). Collect every top-level thread that contains a workflow submission (look for the structured workflow form fields: Robot ID, Date & Time of Issue, Issue Summary / Title, etc.).
 
 For each thread found:
 - Construct the permalink: `https://lionsbot.slack.com/archives/C09H796EZQ8/p{ts_no_dot}` (remove the `.` from the message timestamp).
