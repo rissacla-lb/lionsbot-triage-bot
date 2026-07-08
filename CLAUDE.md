@@ -41,13 +41,14 @@ Use these exact property names when reading or writing. Several have been rename
 | `"Source Channel"` | **multi_select** | Options: `#r5-trials-support` / `#tesco-trial-support` / `#voc-r5-production` / `Other` |
 | `"Customer / Trial Site"` | text | Spaces around the slash — exactly `"Customer / Trial Site"` |
 | `"Slack Thread"` | url | Plain property name — no `userDefined:` prefix |
-| `"AUT Version"` | select | 1.0.4 / 1.1.3 / 1.0.0 / 1.0.2 / 1.0.3 / 0.6.7 / 0.6.4 |
+| `"AUT Version"` | select | 1.3.0 / 1.2.0 / 1.1.6 / 1.1.4 / 1.0.4 / 1.1.3 / 1.0.0 / 1.0.2 / 1.0.3 / 0.6.7 / 0.6.4 |
 | `"Severity"` | select | Urgent / High / Medium / Low |
 | `"Region"` | select | EU / Asia / US / ANZ / Other |
 | `"Reporter"` | person | **DO NOT SET** |
 | `"Engineering Owner"` | person | **DO NOT SET** |
 | `"Components"` | multi_select | **DO NOT SET** |
 | `"Robot ID"` | text | Serial from workflow, verbatim |
+| `"Description"` | text | The **"Issues:"** section of the workflow form, copied VERBATIM — do not paraphrase or summarize |
 | `"AI Triage Notes"` | rich_text | Generated triage summary |
 
 **Read-only fields (never write):** Incident ID (auto_increment_id), Date Reported (created_time), Last Updated, DRI (Issue) rollup, Issue ID rollup, Issue Status rollup, R5 Resolution Tracker rollup, Priority rollup, Added to R5 Resolution Tracker? (formula).
@@ -103,6 +104,7 @@ For candidates that passed dedup, call `mcp__Notion__notion-create-pages` with t
         "AUT Version": "<version from workflow if matches allowed values, else omit>",
         "Severity": "<severity from workflow if present, else omit>",
         "Robot ID": "<serial from workflow>",
+        "Description": "<verbatim text from the workflow's 'Issues:' section>",
         "date:Date of Incident (UTC):start": "<ISO datetime from workflow>",
         "date:Date of Incident (UTC):is_datetime": 1
       }
@@ -202,6 +204,7 @@ Extract these fields from the Slack workflow form text:
 |---|---|
 | `"Issue Summary"` | Workflow title / form title — copy VERBATIM |
 | `"Robot ID"` | "Robot ID" or "Serial Number" field |
+| `"Description"` | The **"Issues:"** section — copy VERBATIM, do not paraphrase or summarize |
 | `"Date of Incident (UTC)"` | "Date & Time of Issue" — extract both date and time exactly as written; do not append any timezone indicator |
 | `"AUT Version"` | "Software Version" or "AUT Version" field — only set if value matches allowed options |
 | `"Customer / Trial Site"` | "Site" or "Customer" field |
