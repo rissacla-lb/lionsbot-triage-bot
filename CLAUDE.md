@@ -18,7 +18,8 @@ You are an autonomous triage bot for the R5 trial fleet. Run this routine every 
 
 ## 2. Hard Rules (never violate)
 
-- **Dedup on Slack Thread URL before every create.** Run a per-candidate lookup (see §5) before creating any row.
+- **Dedup on Slack Thread URL before every create.** Run a single batched lookup (see Step 2) covering all candidate URLs before creating any rows.
+- **Never fire Notion API calls in parallel.** Batch reads where possible; otherwise issue Notion reads/writes one at a time (at most one in flight). Firing many Notion calls at once triggers rate limiting (HTTP 429), which then cascades into timeouts that can stall the entire run.
 - **Intake DB is the ONLY write target.** Clustering DB and person fields are off-limits.
 - **Never fabricate serials, versions, error codes, or sites.** Blank beats wrong.
 - **DO NOT set Reporter or Engineering Owner.** Person fields need Notion user IDs that cannot be resolved from Slack. Leave them blank for Clarissa.
@@ -67,20 +68,20 @@ For each thread found:
 - Construct the permalink: `https://lionsbot.slack.com/archives/C09H796EZQ8/p{ts_no_dot}` (remove the `.` from the message timestamp).
 - Read the full thread with `mcp__Slack__slack_read_thread` to get all replies.
 
-### Step 2 — Dedup against Intake DB (per-candidate)
+### Step 2 — Dedup against Intake DB (single batched query)
 
-For **each candidate** thread URL, run an individual targeted query:
+Run **one** query that checks every candidate thread URL at once using an exact-match `IN` list. Prefer a parameterized query — pass each URL as a `?` param rather than interpolating into the string:
 
 ```sql
-SELECT id
+SELECT id, "Slack Thread"
 FROM "collection://466694f4-e045-4622-9077-a9af36db7db0"
-WHERE "Slack Thread" = '<candidate_url>'
+WHERE "Slack Thread" IN (?, ?, ?, ...)
 ```
 
-- If the query returns **any row**, skip this candidate — it already exists in the DB.
-- If the query returns **no rows**, proceed to create a new row.
+- Any candidate URL **present** in the result set already exists — skip it.
+- Any candidate URL **absent** from the result set has no row — proceed to create it.
 
-> **Why per-candidate?** A full-table scan with pagination can miss existing rows when the table exceeds one result page. Per-candidate queries are exact-match lookups that always return the correct answer regardless of table size.
+> **Why one batched `IN` query?** An `IN` list is still an exact-match lookup on the URL, so it always returns the correct answer regardless of table size — it does NOT depend on scanning/paginating the whole table the way a bare `SELECT *` would, and so cannot miss rows on large tables. Collapsing all candidates into a single request (instead of one query per candidate) keeps round-trips to one call, avoiding the Notion rate limit (HTTP 429) that firing many queries in parallel has previously triggered.
 
 ### Step 3 — Create new rows
 
