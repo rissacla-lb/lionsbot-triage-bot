@@ -42,7 +42,7 @@ Use these exact property names when reading or writing. Several have been rename
 | `"Source Channel"` | **multi_select** | Options: `#r5-trials-support` / `#tesco-trial-support` / `#voc-r5-production` / `Other` |
 | `"Customer / Trial Site"` | text | Spaces around the slash — exactly `"Customer / Trial Site"` |
 | `"Slack Thread"` | url | Plain property name — no `userDefined:` prefix |
-| `"AUT Version"` | select | 1.3.0 / 1.2.0 / 1.1.6 / 1.1.4 / 1.0.4 / 1.1.3 / 1.0.0 / 1.0.2 / 1.0.3 / 0.6.7 / 0.6.4 |
+| `"AUT Version"` | select | 1.3.0 / 1.2.0 / 1.1.6 / 1.1.4 / 1.0.4 / 1.1.3 / 1.0.0 / 1.0.2 / 1.0.3 / 0.6.7 / 0.6.4 / 1.1.7 / 1.1.8 / 1.2.0 / 1.2.1 / 1.3.0 |
 | `"Severity"` | select | Urgent / High / Medium / Low |
 | `"Region"` | select | EU / Asia / US / ANZ / Other |
 | `"Reporter"` | person | **DO NOT SET** |
